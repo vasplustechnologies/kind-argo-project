@@ -5,10 +5,10 @@ resources:
   - ../k8s/inventory-service
   - ../k8s/order-service
   - ../k8s/notification-service
-  - ../k8s/ingress.yaml
 
-commonLabels:
-  app: microservices
-  environment: production
+labels:
+  - pairs:
+      app: microservices
+      environment: production
 
 namespace: default
