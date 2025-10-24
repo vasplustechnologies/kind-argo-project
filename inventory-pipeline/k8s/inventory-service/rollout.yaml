@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: inventory-service
-        image: mofwili/inventory-service:1.0.0
+        image: mofwili/inventory-service:1.0.3
         ports:
         - containerPort: 8080
         env:
