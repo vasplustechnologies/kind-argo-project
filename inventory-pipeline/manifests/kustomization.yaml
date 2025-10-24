@@ -1,0 +1,14 @@
+﻿apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../k8s/inventory-service
+  - ../k8s/order-service
+  - ../k8s/notification-service
+  - ../k8s/ingress.yaml
+
+commonLabels:
+  app: microservices
+  environment: production
+
+namespace: default

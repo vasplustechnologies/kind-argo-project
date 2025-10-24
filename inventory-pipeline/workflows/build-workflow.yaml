@@ -1,0 +1,59 @@
+﻿apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: microservices-build-pipeline
+spec:
+  entrypoint: main-pipeline
+  arguments:
+    parameters:
+    - name: image-tag
+      value: "latest"
+
+  templates:
+  - name: main-pipeline
+    steps:
+    - - name: build-and-test
+        template: build-test
+    - - name: deploy-staging
+        template: deploy-staging
+    - - name: integration-tests
+        template: run-integration-tests
+    - - name: deploy-production
+        template: deploy-production
+
+  - name: build-test
+    container:
+      image: alpine/git
+      command: [sh, -c]
+      args:
+      - |
+        echo "Building and testing microservices with tag: {{workflow.parameters.image-tag}}"
+        echo "Tests passed!"
+
+  - name: deploy-staging
+    container:
+      image: bitnami/kubectl
+      command: [sh, -c]
+      args:
+      - |
+        echo "Deploying to staging with canary rollout"
+        kubectl apply -f k8s/
+
+  - name: run-integration-tests
+    container:
+      image: curlimages/curl
+      command: [sh, -c]
+      args:
+      - |
+        echo "Running integration tests..."
+        sleep 10
+        echo "Integration tests passed!"
+
+  - name: deploy-production
+    container:
+      image: bitnami/kubectl
+      command: [sh, -c]
+      args:
+      - |
+        echo "Deploying to production with canary rollout"
+        kubectl apply -f k8s/

@@ -1,0 +1,40 @@
+﻿apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: webhook-event
+  namespace: argo-events
+spec:
+  webhook:
+    webhook:
+      port: "12000"
+      endpoint: /build
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: webhook-sensor
+  namespace: argo-events
+spec:
+  dependencies:
+  - name: webhook-dep
+    eventSourceName: webhook-event
+    eventName: webhook
+  triggers:
+  - template:
+      name: trigger-workflow
+      k8s:
+        operation: create
+        source:
+          resource:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Workflow
+            metadata:
+              generateName: microservices-build-
+              namespace: argo
+            spec:
+              workflowTemplateRef:
+                name: microservices-build-pipeline
+              arguments:
+                parameters:
+                - name: image-tag
+                  value: "latest"
